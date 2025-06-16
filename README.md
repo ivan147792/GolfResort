@@ -1,2 +1,2 @@
 # GolfResort
-sajt za najsam golf terena i usluga resorta
+sajt za najam golf terena i usluga resorta
