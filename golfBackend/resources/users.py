@@ -36,4 +36,30 @@ class UserLogin(MethodView):
             }, 200
     abort(401, message="Invalid credentials") 
 
+@blp.route("/register")
+class UserRegister(MethodView):
+    @blp.arguments(UserSchema)
+    def post(self, user_data):
+        existing = UserModel.query.filter_by(email=user_data["email"]).first()
+        if existing:
+            abort(409, message="User already exists")
+        
+        new_user = UserModel(
+            name=user_data["name"],
+            last_name=user_data["last_name"],
+            email=user_data["email"],
+            password=pbkdf2_sha256.hash(user_data["password"]),  
+            role=user_data.get("role", "user")  
+        )
+        
+        db.session.add(new_user)
+        db.session.commit()
+
+        return {"message": "User created"}, 201
+
+@blp.route("/users")
+class UserList(MethodView):
+    @blp.response(200, UserSchema(many=True))
+    def get(self):
+        return UserModel.query.all()
 
